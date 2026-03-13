@@ -1,8 +1,18 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { env, requireEnv } from "../lib/env";
 import { ResumeAnalysis } from "../store/useStore";
 
-export async function analyzeResume(fileBase64: string, mimeType: string): Promise<ResumeAnalysis> {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+function createGeminiClient() {
+  return new GoogleGenAI({
+    apiKey: requireEnv("VITE_GEMINI_API_KEY", env.geminiApiKey),
+  });
+}
+
+export async function analyzeResume(
+  fileBase64: string,
+  mimeType: string,
+): Promise<ResumeAnalysis> {
+  const ai = createGeminiClient();
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
@@ -44,14 +54,21 @@ export async function analyzeResume(fileBase64: string, mimeType: string): Promi
           formattingScore: { type: Type.NUMBER },
           actionItems: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
-        required: ["atsScore", "summary", "topSkills", "missingKeywords", "formattingScore", "actionItems"],
+        required: [
+          "atsScore",
+          "summary",
+          "topSkills",
+          "missingKeywords",
+          "formattingScore",
+          "actionItems",
+        ],
       },
     },
   });
 
   const text = response.text;
   if (!text) throw new Error("No response from Gemini");
-  
+
   try {
     return JSON.parse(text);
   } catch (e) {
@@ -60,8 +77,11 @@ export async function analyzeResume(fileBase64: string, mimeType: string): Promi
   }
 }
 
-export async function generateRoundFeedback(roundType: string, performanceData: any): Promise<string> {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+export async function generateRoundFeedback(
+  roundType: string,
+  performanceData: any,
+): Promise<string> {
+  const ai = createGeminiClient();
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
@@ -89,12 +109,11 @@ export async function generateRoundFeedback(roundType: string, performanceData: 
   return response.text || "Failed to generate feedback.";
 }
 
-
 export async function generateHRResponse(
   chatHistory: { role: string; text: string }[],
 ): Promise<string> {
   // Using your exact existing setup
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+  const ai = createGeminiClient();
 
   // Format the history so the AI understands the back-and-forth
   const formattedHistory = chatHistory

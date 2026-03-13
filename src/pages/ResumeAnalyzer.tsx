@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import { 
-  FileText, 
-  Upload, 
-  Search, 
-  CheckCircle2, 
-  AlertCircle, 
-  Zap, 
+import React, { useState, useRef } from "react";
+import {
+  FileText,
+  Upload,
+  Search,
+  CheckCircle2,
+  AlertCircle,
+  Zap,
   ChevronRight,
   Target,
   BarChart3,
@@ -15,16 +15,20 @@ import {
   RefreshCcw,
   ListChecks,
   Sparkles,
-  Send
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { analyzeResume, generateRoundFeedback } from '../services/geminiService';
-import { useAppStore, ResumeAnalysis } from '../store/useStore';
+  Send,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  analyzeResume,
+  generateRoundFeedback,
+} from "../services/geminiService";
+import { useAppStore, ResumeAnalysis } from "../store/useStore";
 
 export default function ResumeAnalyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { resumeAnalysis, setResumeAnalysis, currentSession, submitRound } = useAppStore();
+  const { resumeAnalysis, setResumeAnalysis, currentSession, submitRound } =
+    useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,9 +37,14 @@ export default function ResumeAnalyzer() {
     if (!file) return;
 
     // Check file type
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const validTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
     if (!validTypes.includes(file.type)) {
-      setError('Please upload a PDF, DOCX, or Image (JPG/PNG).');
+      setError("Please upload a PDF, DOCX, or Image (JPG/PNG).");
       return;
     }
 
@@ -48,7 +57,7 @@ export default function ResumeAnalyzer() {
       setResumeAnalysis(analysis);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to analyze resume. Please try again.');
+      setError(err.message || "Failed to analyze resume. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -59,7 +68,7 @@ export default function ResumeAnalyzer() {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        const base64String = (reader.result as string).split(',')[1];
+        const base64String = (reader.result as string).split(",")[1];
         resolve(base64String);
       };
       reader.onerror = (error) => reject(error);
@@ -75,11 +84,14 @@ export default function ResumeAnalyzer() {
     if (!resumeAnalysis) return;
     setIsSubmitting(true);
     try {
-      const feedback = await generateRoundFeedback('Resume Analysis', resumeAnalysis);
+      const feedback = await generateRoundFeedback(
+        "Resume Analysis",
+        resumeAnalysis,
+      );
       submitRound(resumeAnalysis.atsScore, feedback);
     } catch (err) {
       console.error(err);
-      alert('Failed to submit analysis. Please try again.');
+      alert("Failed to submit analysis. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -88,14 +100,17 @@ export default function ResumeAnalyzer() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-zinc-900 tracking-tight">AI Resume Intelligence</h1>
+        <h1 className="text-4xl font-bold text-zinc-900 tracking-tight">
+          AI Resume Intelligence
+        </h1>
         <p className="text-zinc-500 max-w-2xl mx-auto">
-          Our advanced Resume AI engine analyzes your resume against industry standards and ATS algorithms.
+          Our advanced Resume AI engine analyzes your resume against industry
+          standards and ATS algorithms.
         </p>
       </div>
 
       {!resumeAnalysis && !isAnalyzing ? (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white p-16 rounded-[40px] border-2 border-dashed border-zinc-200 text-center space-y-8 shadow-sm hover:border-emerald-500/50 transition-colors group"
@@ -104,21 +119,24 @@ export default function ResumeAnalyzer() {
             <Upload className="w-12 h-12 text-emerald-600" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-zinc-900">Upload your professional resume</h3>
+            <h3 className="text-2xl font-bold text-zinc-900">
+              Upload your professional resume
+            </h3>
             <p className="text-zinc-500 max-w-sm mx-auto">
-              Supports PDF, DOCX, and Images. Your data is processed securely by our Resume AI.
+              Supports PDF, DOCX, and Images. Your data is processed securely by
+              our Resume AI.
             </p>
           </div>
-          
+
           <div className="flex flex-col items-center gap-4">
-            <input 
-              type="file" 
+            <input
+              type="file"
               ref={fileInputRef}
               onChange={handleFileSelect}
               className="hidden"
               accept=".pdf,.docx,.jpg,.jpeg,.png"
             />
-            <button 
+            <button
               onClick={() => fileInputRef.current?.click()}
               className="bg-zinc-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-zinc-800 transition-all shadow-xl shadow-zinc-900/10 flex items-center gap-2"
             >
@@ -137,7 +155,7 @@ export default function ResumeAnalyzer() {
         <div className="bg-white p-16 rounded-[40px] border border-zinc-200 text-center space-y-8 shadow-sm">
           <div className="relative w-32 h-32 mx-auto">
             <div className="absolute inset-0 rounded-full border-4 border-zinc-100" />
-            <motion.div 
+            <motion.div
               animate={{ rotate: 360 }}
               transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
               className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent"
@@ -147,20 +165,24 @@ export default function ResumeAnalyzer() {
             </div>
           </div>
           <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-zinc-900">Analyzing Resume...</h3>
-            <p className="text-zinc-500">Extracting semantic meaning and calculating ATS compatibility.</p>
+            <h3 className="text-2xl font-bold text-zinc-900">
+              Analyzing Resume...
+            </h3>
+            <p className="text-zinc-500">
+              Extracting semantic meaning and calculating ATS compatibility.
+            </p>
           </div>
           <div className="max-w-md mx-auto h-2 bg-zinc-100 rounded-full overflow-hidden">
-            <motion.div 
+            <motion.div
               initial={{ width: 0 }}
-              animate={{ width: '100%' }}
+              animate={{ width: "100%" }}
               transition={{ duration: 15 }}
               className="h-full bg-emerald-500"
             />
           </div>
         </div>
       ) : (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="grid grid-cols-1 lg:grid-cols-12 gap-8"
@@ -192,25 +214,40 @@ export default function ResumeAnalyzer() {
                       strokeWidth="12"
                       strokeDasharray={552.92}
                       initial={{ strokeDashoffset: 552.92 }}
-                      animate={{ strokeDashoffset: 552.92 * (1 - resumeAnalysis!.atsScore / 100) }}
+                      animate={{
+                        strokeDashoffset:
+                          552.92 * (1 - resumeAnalysis!.atsScore / 100),
+                      }}
                       transition={{ duration: 1.5, ease: "easeOut" }}
                       strokeLinecap="round"
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-5xl font-bold">{resumeAnalysis!.atsScore}</span>
-                    <span className="text-zinc-400 text-sm font-medium">Out of 100</span>
+                    <span className="text-5xl font-bold">
+                      {resumeAnalysis!.atsScore}
+                    </span>
+                    <span className="text-zinc-400 text-sm font-medium">
+                      Out of 100
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="mt-8 grid grid-cols-2 gap-4">
                 <div className="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase">Formatting</p>
-                  <p className="text-xl font-bold text-emerald-400">{resumeAnalysis!.formattingScore}%</p>
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase">
+                    Formatting
+                  </p>
+                  <p className="text-xl font-bold text-emerald-400">
+                    {resumeAnalysis!.formattingScore}%
+                  </p>
                 </div>
                 <div className="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase">Keywords</p>
-                  <p className="text-xl font-bold text-blue-400">{resumeAnalysis!.topSkills.length}</p>
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase">
+                    Keywords
+                  </p>
+                  <p className="text-xl font-bold text-blue-400">
+                    {resumeAnalysis!.topSkills.length}
+                  </p>
                 </div>
               </div>
             </div>
@@ -236,7 +273,10 @@ export default function ResumeAnalyzer() {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {resumeAnalysis!.topSkills.map((skill, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold border border-emerald-100">
+                    <span
+                      key={i}
+                      className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold border border-emerald-100"
+                    >
                       {skill}
                     </span>
                   ))}
@@ -250,7 +290,10 @@ export default function ResumeAnalyzer() {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {resumeAnalysis!.missingKeywords.map((keyword, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-xl text-xs font-bold border border-orange-100">
+                    <span
+                      key={i}
+                      className="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-xl text-xs font-bold border border-orange-100"
+                    >
                       {keyword}
                     </span>
                   ))}
@@ -265,9 +308,14 @@ export default function ResumeAnalyzer() {
               </h3>
               <div className="space-y-3">
                 {resumeAnalysis!.actionItems.map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100 group hover:border-blue-200 transition-colors">
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100 group hover:border-blue-200 transition-colors"
+                  >
                     <div className="w-6 h-6 rounded-full bg-white border border-zinc-200 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-500 group-hover:border-blue-500 transition-all">
-                      <span className="text-[10px] font-bold text-zinc-400 group-hover:text-white">{i + 1}</span>
+                      <span className="text-[10px] font-bold text-zinc-400 group-hover:text-white">
+                        {i + 1}
+                      </span>
                     </div>
                     <p className="text-sm text-zinc-700 font-medium">{item}</p>
                   </div>
@@ -277,16 +325,20 @@ export default function ResumeAnalyzer() {
 
             <div className="flex gap-4">
               {currentSession ? (
-                <button 
+                <button
                   onClick={handleSubmitAnalysis}
                   disabled={isSubmitting}
                   className="flex-1 bg-emerald-500 text-white py-4 rounded-2xl font-bold hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
                 >
-                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
                   Submit Analysis & Continue
                 </button>
               ) : (
-                <button 
+                <button
                   onClick={handleReset}
                   className="flex-1 bg-zinc-900 text-white py-4 rounded-2xl font-bold hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"
                 >
@@ -294,9 +346,6 @@ export default function ResumeAnalyzer() {
                   Analyze New Resume
                 </button>
               )}
-              <button className="px-8 py-4 bg-white border border-zinc-200 rounded-2xl font-bold text-zinc-600 hover:bg-zinc-50 transition-all">
-                Download Report
-              </button>
             </div>
           </div>
         </motion.div>
